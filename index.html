@@ -113,9 +113,10 @@
             
             <div class="flex-1 relative group border-b md:border-b-0 md:border-r border-white/10 flex flex-col">
                 <div class="absolute top-4 left-6 z-10 lang-badge">
-                    <select id="sourceLang">
+                    <select id="sourceLang" onchange="performTranslation(document.getElementById('inputText').value)">
                         <option value="en" selected>English</option>
                         <option value="cs">Czech</option>
+                        <option value="de">German</option>
                     </select>
                 </div>
                 
@@ -135,9 +136,10 @@
                 
                 <div class="absolute top-4 left-6 z-10 flex gap-2 items-center">
                     <div class="lang-badge bg-[var(--nothing-red)]/10 border-[var(--nothing-red)]/30">
-                        <select id="targetLang" class="text-[var(--nothing-red)]">
+                        <select id="targetLang" onchange="performTranslation(document.getElementById('inputText').value)" class="text-[var(--nothing-red)]">
                             <option value="cs" selected>Czech</option>
                             <option value="en">English</option>
+                            <option value="de">German</option>
                         </select>
                     </div>
                     <span id="dbMatchBadge" class="hidden font-mono-tech text-[10px] bg-white/10 text-white px-2 py-1 rounded-sm">DB MATCH FOUND</span>
@@ -169,631 +171,58 @@
     </div>
 
     <script>
-        // --- 1. INTEGRATED DATABASE (Zde je váš soubor otazky_odpovedi.json) ---
+        // --- 1. INTEGRATED DATABASE (Vyčištěná verze) ---
         const database = [
-  {
-    "question": "When a new motherboard is being installed, between which two components must thermal compound be applied?",
-    "correct_answers": [
-      "CPU",
-      "heat sink"
-    ],
-    "incorrect_answers": [
-      "RAM",
-      "chassis",
-      "chipset",
-      "motherboard"
-    ],
-    [cite_start]"citation": "[cite: 10, 11, 12, 13, 14, 15, 16, 17]"
-  },
-  {
-    "question": "A technician is explaining the differences between inkjet printers and laser printers to a customer. Which two comparisons should the technician make?",
-    "correct_answers": [
-      "Inkjet printers are less expensive as an initial purchase than laser printers.",
-      "The laser printer output is dry after printing, but an inkjet printer may still have wet ink on the paper after printing."
-    ],
-    "incorrect_answers": [
-      "A laser printer is significantly slower than an inkjet printer.",
-      "Both laser and inkjet printers produce poor quality images.",
-      "Inkjet printers use plain paper to make economical prints, but laser printers require more expensive thermal paper."
-    ],
-    [cite_start]"citation": "[cite: 21, 22, 23, 24, 25, 26, 27, 28]"
-  },
-  {
-    "question": "Which three components are typically found in laser printer maintenance kits?",
-    "correct_answers": [
-      "fuser assembly",
-      "pickup rollers",
-      "transfer rollers"
-    ],
-    "incorrect_answers": [
-      "primary corona",
-      "secondary corona",
-      "paper trays"
-    ],
-    [cite_start]"citation": "[cite: 29, 30, 31, 32, 33, 34, 35, 36]"
-  },
-  {
-    "question": "Which three features can be configured in the BIOS settings to secure a computer?",
-    "correct_answers": [
-      "drive encryption",
-      "TPM",
-      "passwords"
-    ],
-    "incorrect_answers": [
-      "MAC filtering",
-      "file encryption",
-      "TKIP key"
-    ],
-    [cite_start]"citation": "[cite: 37, 38, 39, 40, 41, 42, 43, 44]"
-  },
-  {
-    "question": "What are two safety hazards when dealing with laser printers?",
-    "correct_answers": [
-      "high voltage",
-      "hot components"
-    ],
-    "incorrect_answers": [
-      "heavy metals",
-      "proprietary power bricks",
-      "unwieldy card cages"
-    ],
-    [cite_start]"citation": "[cite: 45, 46, 47, 48, 49, 50, 51]"
-  },
-  {
-    "question": "What three values must be added to the IPv4 properties of a NIC in order for a computer to have basic connectivity with the network?",
-    "correct_answers": [
-      "subnet mask",
-      "default gateway",
-      "IP address"
-    ],
-    "incorrect_answers": [
-      "DHCP server address",
-      "domain name",
-      "speed and duplex"
-    ],
-    [cite_start]"citation": "[cite: 52, 54, 55, 56, 57, 58, 59, 60]"
-  },
-  {
-    "question": "After a technician tests a theory of probable causes, what action should the technician take if the testing did not identify an exact cause?",
-    "correct_answers": [
-      "Establish a new theory of probable causes."
-    ],
-    "incorrect_answers": [
-      "Randomly replace components one at a time until the problem is solved.",
-      "Verify full system functionality.",
-      "Test all remaining possible causes starting with the most complex."
-    ],
-    [cite_start]"citation": "[cite: 61, 63, 64, 66, 67, 68]"
-  },
-  {
-    "question": "What two motherboard components control the system boot operations?",
-    "correct_answers": [
-      "BIOS chip",
-      "UEFI chip"
-    ],
-    "incorrect_answers": [
-      "Northbridge chip",
-      "Southbridge chip",
-      "CPU"
-    ],
-    [cite_start]"citation": "[cite: 69, 70, 71, 72, 73, 74, 75]"
-  },
-  {
-    "question": "What are two types of wired high-speed Internet connections?",
-    "correct_answers": [
-      "cable",
-      "DSL"
-    ],
-    "incorrect_answers": [
-      "satellite",
-      "cellular",
-      "dial-up"
-    ],
-    [cite_start]"citation": "[cite: 76, 77, 78, 79, 80, 81, 82]"
-  },
-  {
-    "question": "In what two situations would UDP be better than TCP as the preferred transport protocol?",
-    "correct_answers": [
-      "when a faster delivery mechanism is needed",
-      "when delivery overhead is not an issue"
-    ],
-    "incorrect_answers": [
-      "when applications need to guarantee that a packet arrives intact, in sequence, and unduplicated",
-      "when applications do not need to guarantee delivery of the data",
-      "when destination port numbers are dynamic"
-    ],
-    [cite_start]"citation": "[cite: 83, 84, 85, 86, 87, 88, 89]"
-  },
-  {
-    "question": "Which two laptop components are considered replaceable by the customer?",
-    "correct_answers": [
-      "battery",
-      "RAM"
-    ],
-    "incorrect_answers": [
-      "integrated card reader",
-      "mini-PCIe module",
-      "display"
-    ],
-    [cite_start]"citation": "[cite: 90, 91, 92, 93, 94, 95, 96]"
-  },
-  {
-    "question": "A user wants to synchronize some apps, movies, music, and ebooks between mobile devices. What are the two types of connections used to synchronize this type of data?",
-    "correct_answers": [
-      "Wi-Fi",
-      "USB"
-    ],
-    "incorrect_answers": [
-      "cellular",
-      "Bluetooth",
-      "NFC"
-    ],
-    [cite_start]"citation": "[cite: 97, 98, 99, 100, 101, 102, 103, 104]"
-  },
-  {
-    "question": "A computer technician is installing a RAID. If the RAID uses striping with parity, which RAID level is the technician using?",
-    "correct_answers": [
-      "5"
-    ],
-    "incorrect_answers": [
-      "0",
-      "1",
-      "4",
-      "6",
-      "10"
-    ],
-    [cite_start]"citation": "[cite: 1074, 1075, 1076, 1077, 1078, 1079]"
-  },
-  {
-    "question": "A computer technician is installing a RAID. If the RAID uses mirroring and striping, which RAID level is the technician using?",
-    "correct_answers": [
-      "10"
-    ],
-    "incorrect_answers": [
-      "0",
-      "1",
-      "8"
-    ],
-    [cite_start]"citation": "[cite: 1080, 1081, 1082, 1083, 1084, 1085]"
-  },
-  {
-    "question": "A computer technician is installing a RAID. If the RAID uses striping with double parity, which RAID level is the technician using?",
-    "correct_answers": [
-      "6"
-    ],
-    "incorrect_answers": [
-      "10",
-      "5",
-      "7",
-      "0",
-      "1"
-    ],
-    [cite_start]"citation": "[cite: 1098, 1099, 1100, 1101, 1102, 1103]"
-  },
-  {
-    "question": "A computer technician is installing a RAID. If the RAID uses mirroring, which RAID level is the technician using?",
-    "correct_answers": [
-      "1"
-    ],
-    "incorrect_answers": [
-      "10",
-      "6",
-      "3",
-      "0",
-      "5"
-    ],
-    [cite_start]"citation": "[cite: 1104, 1105, 1106, 1107, 1108, 1109]"
-  },
-  {
-    "question": "A computer technician is installing a RAID. If the RAID uses striping (without parity or mirroring), which RAID level is the technician using?",
-    "correct_answers": [
-      "0"
-    ],
-    "incorrect_answers": [
-      "1",
-      "5",
-      "2",
-      "10",
-      "6"
-    ],
-    [cite_start]"citation": "[cite: 1122, 1123, 1124, 1125, 1126, 1127]"
-  },
-  {
-    "question": "Which security technique should be recommended for drive redundancy?",
-    "correct_answers": [
-      "Implement a RAID."
-    ],
-    "incorrect_answers": [
-      "Buy an ASA.",
-      "Buy an IPS.",
-      "Implement dual authentication."
-    ],
-    [cite_start]"citation": "[cite: 1134, 1136, 1137, 1138, 1139, 1140]"
-  },
-  {
-    "question": "Which security technique should be recommended for phishing?",
-    "correct_answers": [
-      "Provide security awareness training."
-    ],
-    "incorrect_answers": [
-      "Buy an ASA.",
-      "Buy an IPS.",
-      "Employ ping sweeps."
-    ],
-    [cite_start]"citation": "[cite: 1141, 1143, 1144, 1145, 1146, 1147]"
-  },
-  {
-    "question": "Which security technique should be recommended for protecting a computer from someone using a bootable disk containing hacking tools?",
-    "correct_answers": [
-      "Disable ports."
-    ],
-    "incorrect_answers": [
-      "Buy an ASA.",
-      "Buy an IPS.",
-      "Employ ping sweeps.",
-      "Run vulnerability scanners.",
-      "Use a VPN."
-    ],
-    [cite_start]"citation": "[cite: 1148, 1150, 1151, 1152, 1153, 1154]"
-  },
-  {
-    "question": "Which security technique should be recommended for a manager traveling who needs access to internal corporate resources?",
-    "correct_answers": [
-      "Use a VPN."
-    ],
-    "incorrect_answers": [
-      "Disable ports.",
-      "Buy an ASA.",
-      "Run vulnerability scanners."
-    ],
-    [cite_start]"citation": "[cite: 1169, 1171, 1172, 1173, 1174, 1175]"
-  },
-  {
-    "question": "Which security technique should be recommended for a small company that wants stateful firewall services?",
-    "correct_answers": [
-      "Buy an ASA."
-    ],
-    "incorrect_answers": [
-      "Disable ports.",
-      "Use a VPN.",
-      "Setup footprinting."
-    ],
-    [cite_start]"citation": "[cite: 1176, 1178, 1179, 1180, 1181, 1182]"
-  },
-  {
-    "question": "Which security technique should be recommended for a company that wants a device to monitor incoming and outgoing traffic and stop any malicious activity?",
-    "correct_answers": [
-      "Buy an IPS."
-    ],
-    "incorrect_answers": [
-      "Disable ports.",
-      "Use a VPN.",
-      "Setup footprinting.",
-      "Use SSL."
-    ],
-    [cite_start]"citation": "[cite: 1183, 1185, 1186, 1187, 1188, 1189]"
-  },
-  {
-    "question": "Which security technique should be recommended for a machine where the antimalware software cannot remove all of the malware?",
-    "correct_answers": [
-      "Use Windows Safe Mode."
-    ],
-    "incorrect_answers": [
-      "Disable ports.",
-      "Use a VPN.",
-      "Use SSL."
-    ],
-    [cite_start]"citation": "[cite: 1197, 1199, 1200, 1201, 1202, 1203]"
-  },
-  {
-    "question": "Which term describes a file system that supports a partition size up to 16 exabytes?",
-    "correct_answers": [
-      "NTFS"
-    ],
-    "incorrect_answers": [
-      "formatting",
-      "dynamic disk",
-      "basic disk"
-    ],
-    [cite_start]"citation": "[cite: 1204, 1205, 1206, 1207, 1208, 1209]"
-  },
-  {
-    "question": "Which term describes a partition that is used to store and boot an operating system by default?",
-    "correct_answers": [
-      "active partition"
-    ],
-    "incorrect_answers": [
-      "FAT32",
-      "formatting",
-      "dynamic disk"
-    ],
-    [cite_start]"citation": "[cite: 1210, 1211, 1212, 1213, 1214, 1215]"
-  },
-  {
-    "question": "Which term describes a file system for USB flash drives that supports files larger than 4 GB?",
-    "correct_answers": [
-      "exFAT"
-    ],
-    "incorrect_answers": [
-      "formatting",
-      "dynamic disk",
-      "basic disk"
-    ],
-    [cite_start]"citation": "[cite: 1216, 1217, 1218, 1219, 1220, 1221]"
-  },
-  {
-    "question": "Which term describes a partition that supports up to 23 logical drives?",
-    "correct_answers": [
-      "extended partition"
-    ],
-    "incorrect_answers": [
-      "FAT32",
-      "formatting",
-      "dynamic disk"
-    ],
-    [cite_start]"citation": "[cite: 1222, 1223, 1224, 1225, 1226, 1227]"
-  },
-  {
-    "question": "Which term describes a type of partition that would only exist on a hard disk that has an MBR?",
-    "correct_answers": [
-      "logical drive"
-    ],
-    "incorrect_answers": [
-      "FAT32",
-      "formatting",
-      "dynamic disk"
-    ],
-    [cite_start]"citation": "[cite: 1228, 1229, 1230, 1231, 1232, 1233]"
-  },
-  {
-    "question": "Which term describes a file system for optical disk media?",
-    "correct_answers": [
-      "CDFS"
-    ],
-    "incorrect_answers": [
-      "formatting",
-      "dynamic disk",
-      "basic disk",
-      "partition",
-      "MBR",
-      "GPT"
-    ],
-    [cite_start]"citation": "[cite: 1234, 1236, 1239, 1240, 1242, 1245]"
-  },
-  {
-    "question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker is using a vulnerability that is known to the software vendor, but not patched yet. What is the type of network attack?",
-    "correct_answers": [
-      "zero-day"
-    ],
-    "incorrect_answers": [
-      "DDoS",
-      "DNS poisoning",
-      "DoS"
-    ],
-    [cite_start]"citation": "[cite: 1264, 1266, 1267, 1268, 1269, 1270]"
-  },
-  {
-    "question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that zombies were used to attack the firewall. What is the type of network attack?",
-    "correct_answers": [
-      "DDoS"
-    ],
-    "incorrect_answers": [
-      "DNS poisoning",
-      "SYN flood",
-      "DoS"
-    ],
-    [cite_start]"citation": "[cite: 1271, 1273, 1274, 1275, 1276, 1277]"
-  },
-  {
-    "question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker is using a table of words that potentially could be used as passwords. What is the type of network attack?",
-    "correct_answers": [
-      "dictionary"
-    ],
-    "incorrect_answers": [
-      "SYN flood",
-      "DNS poisoning",
-      "zero-day"
-    ],
-    [cite_start]"citation": "[cite: 1278, 1280, 1281, 1282, 1283, 1284]"
-  },
-  {
-    "question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker injected false records on the server that translates IP addresses to domain names. What is the type of network attack?",
-    "correct_answers": [
-      "DNS poisoning"
-    ],
-    "incorrect_answers": [
-      "zero-day",
-      "SYN flood",
-      "dictionary"
-    ],
-    [cite_start]"citation": "[cite: 1285, 1287, 1288, 1289, 1290, 1291]"
-  },
-  {
-    "question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker is using a technique that compares hashed passwords to potential hashes the hacker has. What is the type of network attack?",
-    "correct_answers": [
-      "rainbow table"
-    ],
-    "incorrect_answers": [
-      "SYN flood",
-      "DNS poisoning",
-      "zero-day"
-    ],
-    [cite_start]"citation": "[cite: 1292, 1294, 1295, 1296, 1297, 1298]"
-  },
-  {
-    "question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker was using a specific technique that affected the TCP three-way handshake. What is the type of network attack?",
-    "correct_answers": [
-      "SYN flood"
-    ],
-    "incorrect_answers": [
-      "zero-day",
-      "DNS poisoning",
-      "dictionary"
-    ],
-    [cite_start]"citation": "[cite: 1299, 1301, 1302, 1303, 1304, 1305]"
-  },
-  {
-    "question": "A technician is working on a laptop and an error message about decryption appears when opening an email. What is a possible solution?",
-    "correct_answers": [
-      "Install an appropriate certificate."
-    ],
-    "incorrect_answers": [
-      "Check the screen refresh rate.",
-      "Ensure that only one app is open at a time.",
-      "Ensure that Wi-Fi is turned off.",
-      "Replace the digitizer.",
-      "Check the display settings."
-    ],
-    [cite_start]"citation": "[cite: 1306, 1308, 1309, 1310, 1311, 1312]"
-  },
-  {
-    "question": "A technician is working on a laptop and a key on the keyboard is not responding as it should. What is a possible solution?",
-    "correct_answers": [
-      "Clean with compressed air."
-    ],
-    "incorrect_answers": [
-      "Update all security apps.",
-      "Check the screen refresh rate.",
-      "Check the display settings.",
-      "Ensure that Bluetooth is not activated."
-    ],
-    [cite_start]"citation": "[cite: 1327, 1329, 1330, 1331, 1332, 1333]"
-  },
-  {
-    "question": "A technician is working on a laptop and GPS is not functioning. What is a possible solution?",
-    "correct_answers": [
-      "Verify that airplane mode is not activated."
-    ],
-    "incorrect_answers": [
-      "Ensure that Bluetooth is not activated.",
-      "Check the screen refresh rate.",
-      "Check the display settings.",
-      "Check the fan on the GPU.",
-      "Ensure that Wi-Fi is turned off."
-    ],
-    [cite_start]"citation": "[cite: 1341, 1342, 1343, 1344, 1345, 1346]"
-  },
-  {
-    "question": "Why would a manager need to use the tracert command?",
-    "correct_answers": [
-      "to display a list of the near-side router interfaces between the source device and the destination device"
-    ],
-    "incorrect_answers": [
-      "to move that file to a different Windows directory while also leaving the file in the current location",
-      "to copy a group of files from one Windows directory to another",
-      "to relocate a file from one Windows directory to another one"
-    ],
-    [cite_start]"citation": "[cite: 1371, 1372, 1373, 1374, 1375, 1376]"
-  },
-  {
-    "question": "Why would a manager need to use the sfc command?",
-    "correct_answers": [
-      "to scan and verify the integrity of all protected system files and replace incorrect versions with correct versions"
-    ],
-    "incorrect_answers": [
-      "to move that file to a different Windows directory while also leaving the file in the current location",
-      "to copy a group of files from one Windows directory to another",
-      "to relocate a file from one Windows directory to another one"
-    ],
-    [cite_start]"citation": "[cite: 1377, 1378, 1379, 1380, 1381, 1382]"
-  },
-  {
-    "question": "Why would a technician need to use the DISM command?",
-    "correct_answers": [
-      "to repair, prepare, and fix Windows images and the recovery image within an installation of the operating system"
-    ],
-    "incorrect_answers": [
-      "to move that file to a different Windows directory while also leaving the file in the current location",
-      "to copy a group of files from one Windows directory to another",
-      "to relocate a file from one Windows directory to another one"
-    ],
-    [cite_start]"citation": "[cite: 1383, 1384, 1385, 1386, 1387, 1388]"
-  },
-  {
-    "question": "Why would a technician need to use the tasklist command?",
-    "correct_answers": [
-      "to display a list of current processes running on a local or a remote computer"
-    ],
-    "incorrect_answers": [
-      "to create a new Windows directory",
-      "to remove an empty directory",
-      "to change from the current working folder to another folder"
-    ],
-    [cite_start]"citation": "[cite: 1389, 1390, 1391, 1392, 1393, 1394]"
-  },
-  {
-    "question": "Why would an analyst need to use the taskkill command?",
-    "correct_answers": [
-      "to end one or more processes on a PC based on process ID or image name"
-    ],
-    "incorrect_answers": [
-      "to create a new Windows directory",
-      "to remove an empty directory",
-      "to change from the current working folder to another folder"
-    ],
-    [cite_start]"citation": "[cite: 1395, 1396, 1397, 1398, 1399, 1400]"
-  },
-  {
-    "question": "Why would an analyst need to use the msconfig command?",
-    "correct_answers": [
-      "to select some programs that will automatically run at startup"
-    ],
-    "incorrect_answers": [
-      "to remove an empty directory",
-      "to erase one or more files from a Windows directory",
-      "to create a new Windows directory"
-    ],
-    [cite_start]"citation": "[cite: 1401, 1402, 1403, 1404, 1405, 1406]"
-  },
-  {
-    "question": "Why would an analyst need to use the dir command?",
-    "correct_answers": [
-      "to show all of the files in the current directory"
-    ],
-    "incorrect_answers": [
-      "to remove an empty directory",
-      "to erase one or more files from a Windows directory",
-      "to create a new Windows directory"
-    ],
-    [cite_start]"citation": "[cite: 1407, 1408, 1409, 1410, 1411, 1412]"
-  },
-  {
-    "question": "Why would a bank manager need to use the gpupdate command?",
-    "correct_answers": [
-      "to make the PC synchronize with new group policy settings"
-    ],
-    "incorrect_answers": [
-      "to remove an empty directory",
-      "to erase one or more files from a Windows directory",
-      "to create a new Windows directory"
-    ],
-    [cite_start]"citation": "[cite: 1413, 1414, 1415, 1416, 1417, 1418]"
-  },
-  {
-    "question": "Why would a bank manager need to use the gpresult command?",
-    "correct_answers": [
-      "to verify the settings that are suspected to be incorrect"
-    ],
-    "incorrect_answers": [
-      "to remove an empty directory",
-      "to erase one or more files from a Windows directory",
-      "to create a new Windows directory"
-    ],
-    [cite_start]"citation": "[cite: 1419, 1420, 1421, 1422, 1423, 1424]"
-  },
-  {
-    "question": "Why would a lawyer need to use the cd command?",
-    "correct_answers": [
-      "to change from the current working folder to another folder"
-    ],
-    "incorrect_answers": [
-      "to remove an empty directory",
-      "to erase one or more files from a Windows directory",
-      "to create a new Windows directory"
-    ],
-    [cite_start]"citation": "[cite: 1425, 1426, 1427, 1428, 1429, 1430]"
-  }
-];
+            {"question": "When a new motherboard is being installed, between which two components must thermal compound be applied?", "correct_answers": ["CPU", "heat sink"]},
+            {"question": "A technician is explaining the differences between inkjet printers and laser printers to a customer. Which two comparisons should the technician make?", "correct_answers": ["Inkjet printers are less expensive as an initial purchase than laser printers.", "The laser printer output is dry after printing, but an inkjet printer may still have wet ink on the paper after printing."]},
+            {"question": "Which three components are typically found in laser printer maintenance kits?", "correct_answers": ["fuser assembly", "pickup rollers", "transfer rollers"]},
+            {"question": "Which three features can be configured in the BIOS settings to secure a computer?", "correct_answers": ["drive encryption", "TPM", "passwords"]},
+            {"question": "What are two safety hazards when dealing with laser printers?", "correct_answers": ["high voltage", "hot components"]},
+            {"question": "What three values must be added to the IPv4 properties of a NIC in order for a computer to have basic connectivity with the network?", "correct_answers": ["subnet mask", "default gateway", "IP address"]},
+            {"question": "After a technician tests a theory of probable causes, what action should the technician take if the testing did not identify an exact cause?", "correct_answers": ["Establish a new theory of probable causes."]},
+            {"question": "What two motherboard components control the system boot operations?", "correct_answers": ["BIOS chip", "UEFI chip"]},
+            {"question": "What are two types of wired high-speed Internet connections?", "correct_answers": ["cable", "DSL"]},
+            {"question": "In what two situations would UDP be better than TCP as the preferred transport protocol?", "correct_answers": ["when a faster delivery mechanism is needed", "when delivery overhead is not an issue"]},
+            {"question": "Which two laptop components are considered replaceable by the customer?", "correct_answers": ["battery", "RAM"]},
+            {"question": "A user wants to synchronize some apps, movies, music, and ebooks between mobile devices. What are the two types of connections used to synchronize this type of data?", "correct_answers": ["Wi-Fi", "USB"]},
+            {"question": "A computer technician is installing a RAID. If the RAID uses striping with parity, which RAID level is the technician using?", "correct_answers": ["5"]},
+            {"question": "A computer technician is installing a RAID. If the RAID uses mirroring and striping, which RAID level is the technician using?", "correct_answers": ["10"]},
+            {"question": "A computer technician is installing a RAID. If the RAID uses striping with double parity, which RAID level is the technician using?", "correct_answers": ["6"]},
+            {"question": "A computer technician is installing a RAID. If the RAID uses mirroring, which RAID level is the technician using?", "correct_answers": ["1"]},
+            {"question": "A computer technician is installing a RAID. If the RAID uses striping (without parity or mirroring), which RAID level is the technician using?", "correct_answers": ["0"]},
+            {"question": "Which security technique should be recommended for drive redundancy?", "correct_answers": ["Implement a RAID."]},
+            {"question": "Which security technique should be recommended for phishing?", "correct_answers": ["Provide security awareness training."]},
+            {"question": "Which security technique should be recommended for protecting a computer from someone using a bootable disk containing hacking tools?", "correct_answers": ["Disable ports."]},
+            {"question": "Which security technique should be recommended for a manager traveling who needs access to internal corporate resources?", "correct_answers": ["Use a VPN."]},
+            {"question": "Which security technique should be recommended for a small company that wants stateful firewall services?", "correct_answers": ["Buy an ASA."]},
+            {"question": "Which security technique should be recommended for a company that wants a device to monitor incoming and outgoing traffic and stop any malicious activity?", "correct_answers": ["Buy an IPS."]},
+            {"question": "Which security technique should be recommended for a machine where the antimalware software cannot remove all of the malware?", "correct_answers": ["Use Windows Safe Mode."]},
+            {"question": "Which term describes a file system that supports a partition size up to 16 exabytes?", "correct_answers": ["NTFS"]},
+            {"question": "Which term describes a partition that is used to store and boot an operating system by default?", "correct_answers": ["active partition"]},
+            {"question": "Which term describes a file system for USB flash drives that supports files larger than 4 GB?", "correct_answers": ["exFAT"]},
+            {"question": "Which term describes a partition that supports up to 23 logical drives?", "correct_answers": ["extended partition"]},
+            {"question": "Which term describes a type of partition that would only exist on a hard disk that has an MBR?", "correct_answers": ["logical drive"]},
+            {"question": "Which term describes a file system for optical disk media?", "correct_answers": ["CDFS"]},
+            {"question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker is using a vulnerability that is known to the software vendor, but not patched yet. What is the type of network attack?", "correct_answers": ["zero-day"]},
+            {"question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that zombies were used to attack the firewall. What is the type of network attack?", "correct_answers": ["DDoS"]},
+            {"question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker is using a table of words that potentially could be used as passwords. What is the type of network attack?", "correct_answers": ["dictionary"]},
+            {"question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker injected false records on the server that translates IP addresses to domain names. What is the type of network attack?", "correct_answers": ["DNS poisoning"]},
+            {"question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker is using a technique that compares hashed passwords to potential hashes the hacker has. What is the type of network attack?", "correct_answers": ["rainbow table"]},
+            {"question": "Users in a company have complained about network performance. After investigation, the IT staff has determined that the attacker was using a specific technique that affected the TCP three-way handshake. What is the type of network attack?", "correct_answers": ["SYN flood"]},
+            {"question": "A technician is working on a laptop and an error message about decryption appears when opening an email. What is a possible solution?", "correct_answers": ["Install an appropriate certificate."]},
+            {"question": "A technician is working on a laptop and a key on the keyboard is not responding as it should. What is a possible solution?", "correct_answers": ["Clean with compressed air."]},
+            {"question": "A technician is working on a laptop and GPS is not functioning. What is a possible solution?", "correct_answers": ["Verify that airplane mode is not activated."]},
+            {"question": "Why would a manager need to use the tracert command?", "correct_answers": ["to display a list of the near-side router interfaces between the source device and the destination device"]},
+            {"question": "Why would a manager need to use the sfc command?", "correct_answers": ["to scan and verify the integrity of all protected system files and replace incorrect versions with correct versions"]},
+            {"question": "Why would a technician need to use the DISM command?", "correct_answers": ["to repair, prepare, and fix Windows images and the recovery image within an installation of the operating system"]},
+            {"question": "Why would a technician need to use the tasklist command?", "correct_answers": ["to display a list of current processes running on a local or a remote computer"]},
+            {"question": "Why would an analyst need to use the taskkill command?", "correct_answers": ["to end one or more processes on a PC based on process ID or image name"]},
+            {"question": "Why would an analyst need to use the msconfig command?", "correct_answers": ["to select some programs that will automatically run at startup"]},
+            {"question": "Why would an analyst need to use the dir command?", "correct_answers": ["to show all of the files in the current directory"]},
+            {"question": "Why would a bank manager need to use the gpupdate command?", "correct_answers": ["to make the PC synchronize with new group policy settings"]},
+            {"question": "Why would a bank manager need to use the gpresult command?", "correct_answers": ["to verify the settings that are suspected to be incorrect"]},
+            {"question": "Why would a lawyer need to use the cd command?", "correct_answers": ["to change from the current working folder to another folder"]}
+        ];
 
         // --- 2. LOGIC & VARIABLES ---
         const inputText = document.getElementById('inputText');
@@ -801,6 +230,8 @@
         const magicButton = document.getElementById('magicButton');
         const dbMatchBadge = document.getElementById('dbMatchBadge');
         const modeLabel = document.getElementById('modeLabel');
+        const sourceLang = document.getElementById('sourceLang');
+        const targetLang = document.getElementById('targetLang');
 
         let debounceTimer;
         let currentTranslation = "";
@@ -842,7 +273,7 @@
                         // Even if in cheat mode, fetch translation quietly in bg so we can swap back
                         performTranslation(text, true); 
                     }
-                }, 600);
+                }, 800);
             } else {
                 outputText.value = '';
                 currentTranslation = '';
@@ -864,9 +295,15 @@
 
         // --- 5. TRANSLATION (API) ---
         async function performTranslation(text, silent = false) {
+            if (!text) return;
+            
             try {
+                // Read current language selection
+                const sLang = sourceLang.value;
+                const tLang = targetLang.value;
+
                 // Using MyMemory API (Standard, Free, No Auth required)
-                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|cs`;
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sLang}|${tLang}`;
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -878,7 +315,7 @@
                 }
             } catch (e) {
                 console.error("Translation offline");
-                if (!silent && !isCheatMode) outputText.value = "...";
+                if (!silent && !isCheatMode) outputText.value = "Translation Error (Check Net)";
             }
         }
 
