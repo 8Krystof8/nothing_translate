@@ -171,7 +171,7 @@
     </div>
 
     <script>
-        // --- 1. INTEGRATED DATABASE (Vyčištěná verze) ---
+        // --- 1. INTEGROVANÁ DATABÁZE (Všechny otázky a odpovědi) ---
         const database = [
   {
     "question": "When a new motherboard is being installed, between which two components must thermal compound be applied?",
@@ -797,7 +797,7 @@
   }
 ];
 
-        // --- 2. LOGIC & VARIABLES ---
+        // --- 2. LOGIKA A PROMĚNNÉ ---
         const inputText = document.getElementById('inputText');
         const outputText = document.getElementById('outputText');
         const magicButton = document.getElementById('magicButton');
@@ -810,20 +810,21 @@
         let currentTranslation = "";
         let currentDBAnswer = null;
         
-        // Load preference (Cookie/Storage)
+        // Načtení nastavení (zapamatuje si, jestli byl zapnutý cheat mode)
         let isCheatMode = localStorage.getItem('nothing_cheat_mode') === 'true';
 
-        // Apply initial state
+        // Aplikace úvodního stavu
         updateUIState();
 
-        // --- 3. INPUT HANDLING ---
+        // --- 3. ZPRACOVÁNÍ VSTUPU ---
         inputText.addEventListener('input', () => {
             const text = inputText.value;
             
-            // Check DB immediately (sync)
+            // Okamžitá kontrola v databázi (lokálně)
             const found = findInDatabase(text);
             
             if (found) {
+                // Pokud najde shodu v DB, připraví odpověď
                 currentDBAnswer = found.correct_answers.join("\n\n");
                 dbMatchBadge.classList.remove('hidden');
             } else {
@@ -831,19 +832,20 @@
                 dbMatchBadge.classList.add('hidden');
             }
 
-            // Decide what to show instantly based on Mode
+            // Rozhodnutí, co zobrazit hned (podle režimu)
             if (isCheatMode && currentDBAnswer) {
                 outputText.value = currentDBAnswer;
             }
 
-            // Fetch Translation (async) for the "Normal Mode"
+            // Překlad (asynchronně přes API)
             clearTimeout(debounceTimer);
             if (text.trim() !== '') {
                 debounceTimer = setTimeout(() => {
-                    if (!isCheatMode || !currentDBAnswer) { // Only fetch if we need to show it
+                    if (!isCheatMode || !currentDBAnswer) { 
+                        // Pokud nejsme v cheat módu nebo nemáme odpověď, přeložíme
                         performTranslation(text);
                     } else {
-                        // Even if in cheat mode, fetch translation quietly in bg so we can swap back
+                        // I v cheat módu stahujeme překlad na pozadí, abychom mohli přepnout
                         performTranslation(text, true); 
                     }
                 }, 800);
@@ -853,35 +855,35 @@
             }
         });
 
-        // --- 4. DATABASE SEARCH (NORMALIZED) ---
+        // --- 4. VYHLEDÁVÁNÍ V DATABÁZI ---
         function findInDatabase(query) {
             if (!query || query.length < 5) return null;
             
+            // Odstraníme speciální znaky pro lepší shodu
             const cleanQuery = query.toLowerCase().replace(/[^a-z0-9]/g, "");
             
-            // 1. Exact/Close Match
             return database.find(item => {
                 const cleanQ = item.question.toLowerCase().replace(/[^a-z0-9]/g, "");
                 return cleanQ.includes(cleanQuery) || cleanQuery.includes(cleanQ);
             });
         }
 
-        // --- 5. TRANSLATION (API) ---
+        // --- 5. PŘEKLAD (API) ---
         async function performTranslation(text, silent = false) {
             if (!text) return;
             
             try {
-                // Read current language selection
                 const sLang = sourceLang.value;
                 const tLang = targetLang.value;
 
-                // Using MyMemory API (Standard, Free, No Auth required)
+                // Použití MyMemory API
                 const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sLang}|${tLang}`;
                 const response = await fetch(url);
                 const data = await response.json();
 
                 if (data.responseStatus === 200) {
                     currentTranslation = data.responseData.translatedText;
+                    // Pokud uživatel nevidí cheat odpověď, ukážeme překlad
                     if (!silent && (!isCheatMode || !currentDBAnswer)) {
                         outputText.value = currentTranslation;
                     }
@@ -892,10 +894,10 @@
             }
         }
 
-        // --- 6. TOGGLE MODES (THE RED BUTTON) ---
+        // --- 6. PŘEPÍNÁNÍ REŽIMŮ (ČERVENÉ TLAČÍTKO) ---
         function toggleCheatMode() {
             isCheatMode = !isCheatMode;
-            localStorage.setItem('nothing_cheat_mode', isCheatMode); // Save safely
+            localStorage.setItem('nothing_cheat_mode', isCheatMode);
             
             updateUIState();
             refreshOutput();
@@ -906,17 +908,17 @@
                 magicButton.classList.add('mode-active');
                 modeLabel.innerText = "OVERRIDE ACTIVE";
                 modeLabel.style.color = "#D71921";
-                outputText.style.color = "#D71921"; // Red text for answer
+                outputText.style.color = "#D71921"; // Červený text pro odpověď
             } else {
                 magicButton.classList.remove('mode-active');
                 modeLabel.innerText = "STANDARD MODE";
                 modeLabel.style.color = "#6b7280";
-                outputText.style.color = "#E6E6E6"; // Grey text for translation
+                outputText.style.color = "#E6E6E6"; // Šedý text pro překlad
             }
         }
 
         function refreshOutput() {
-            // Swap text immediately
+            // Okamžitá výměna textu
             if (isCheatMode && currentDBAnswer) {
                 outputText.value = currentDBAnswer;
             } else {
